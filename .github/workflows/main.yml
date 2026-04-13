@@ -4,7 +4,7 @@ on:
   push:
     branches: ["main", "develop"]
   pull_request:
-    branches:  ["main", "develop"]
+    branches: ["main", "develop"]
 
 jobs:
   # pour le jeu Two-Ships
@@ -34,3 +34,6 @@ jobs:
       - name: Run unit tests
         working-directory: games/Two-Ships-ITN
         run: npm test
+
+  # pour le jeu Space-Invaders
+  test-space-invaders:
