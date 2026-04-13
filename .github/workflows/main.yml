@@ -1,0 +1,39 @@
+name: Jeux
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main", "develop"]
+
+jobs:
+  # pour le jeu Two-Ships
+  test-two-ships:
+    name: Test Two Ships ITN
+    runs-on: ubuntu-latest
+    steps:
+    # recuperation du code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+    # installation Node.js 20
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          # chemin vers le lockfile pour optimiser la vitesse
+          cache-dependency-path: games/Two-Ships-ITN/package-lock.json
+
+      # installation des dépendences
+      - name: Install dependencies
+        working-directory: games/Two-Ships-ITN
+        run: npm install
+
+      # lancement des tests
+      - name: Run unit tests
+        working-directory: games/Two-Ships-ITN
+        run: npm test
+
+  # pour le jeu Space-Invaders
+  test-space-invaders:
