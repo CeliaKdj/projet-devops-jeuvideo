@@ -1,8 +1,15 @@
 # image node.js
-FROM node:20-alpine AS builder
+FROM node:18-slim AS builder
 
 # dossier de travail dans le conteneur
 WORKDIR /app
+
+# installation outils de build pour advzip-bin(dependances de compression)
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 # copie des fichier de dependances pr optimiser le cache
 COPY package*.json ./
