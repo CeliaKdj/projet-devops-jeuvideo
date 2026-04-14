@@ -11,50 +11,40 @@ on:
       - 'games/Two-Ships-ITN/**'
 
 jobs:
-  # pour le jeu Two-Ships
   test-two-ships:
     runs-on: ubuntu-latest
     steps:
-    # recuperation du code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-    # installation Node.js 18
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          # chemin vers le lockfile pour optimiser la vitesse
           cache-dependency-path: games/Two-Ships-ITN/package-lock.json
 
-    # installation des dépendences
       - name: Install dependencies
         working-directory: games/Two-Ships-ITN
         run: npm install
 
-    # audit de securité
       - name: Security audit
         working-directory: games/Two-Ships-ITN
         run: npm audit --audit-level=high
         continue-on-error: true
 
-    # lancement des tests unitaires et fonctionnels
       - name: Run all tests
         working-directory: games/Two-Ships-ITN
         run: npm test
 
-    # lancement des tests unitaires et fonctionnels
       - name: Build project
         working-directory: games/Two-Ships-ITN
         run: npm run build
 
-    # création image docker
       - name: Build Docker Image
         working-directory: games/Two-Ships-ITN
         run: docker build -t two-ships-itn:${{ github.sha }} .
 
-    # sauvegarde de l'artefact
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
