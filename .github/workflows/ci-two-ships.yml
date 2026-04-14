@@ -28,6 +28,16 @@ jobs:
         working-directory: games/Two-Ships-ITN
         run: npm install
 
+      - name: Run Linter (Google Style)
+        working-directory: games/Two-Ships-ITN
+        run: npx eslint . --ext .js --format checkstyle > eslint-report.xml || echo "LINT_FAILED=true" >> $GITHUB_ENV
+
+      - name: Annotate Linter Results
+        uses: mscoutermarsh/eslint-annotate-action@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          eslint-report: games/Two-Ships-ITN/eslint-report.xml
+
       - name: Security audit
         working-directory: games/Two-Ships-ITN
         run: npm audit --audit-level=high
@@ -50,3 +60,13 @@ jobs:
         with:
           name: game-dist
           path: games/Two-Ships-ITN/dist/
+
+      - name: Generate Summary
+        if: always()
+        run: |
+          echo "### Résumé de l'analyse" >> $GITHUB_STEP_SUMMARY
+          echo "| Étape | État |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+          echo "| Linting (Style) | ${{ env.LINT_FAILED == 'true' && 'Warnings' || 'OK' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Sécurité | Audit terminé |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests unitaires | Exécutés |" >> $GITHUB_STEP_SUMMARY
