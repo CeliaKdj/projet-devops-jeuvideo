@@ -1,39 +1,39 @@
-name: Jeux
+name: Space Invaders
 
 on:
   push:
     branches: ["main", "develop"]
+    paths:
+      - 'games/Space-Invaders/**'
   pull_request:
     branches: ["main", "develop"]
+    paths:
+      - 'games/Space-Invaders/**'
 
 jobs:
-  # pour le jeu Two-Ships
-  test-two-ships:
-    name: Test Two Ships ITN
+  test-space-invaders:
+    name: Test Space Invaders
     runs-on: ubuntu-latest
     steps:
-    # recuperation du code
+      # recuperation du code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-    # installation Node.js 20
+      # installation Node.js 20
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
           # chemin vers le lockfile pour optimiser la vitesse
-          cache-dependency-path: games/Two-Ships-ITN/package-lock.json
+          cache-dependency-path: games/Space-Invaders/package-lock.json
 
-      # installation des dépendences
+      # installation des dépendances
       - name: Install dependencies
-        working-directory: games/Two-Ships-ITN
+        working-directory: games/Space-Invaders
         run: npm install
 
       # lancement des tests
       - name: Run unit tests
-        working-directory: games/Two-Ships-ITN
+        working-directory: games/Space-Invaders
         run: npm test
-
-  # pour le jeu Space-Invaders workflow
-  test-space-invaders:
