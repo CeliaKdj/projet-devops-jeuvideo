@@ -1,5 +1,5 @@
 # image node.js
-FROM node:18-slim AS builder
+FROM node:22-slim AS builder
 
 # dossier de travail dans le conteneur
 WORKDIR /app

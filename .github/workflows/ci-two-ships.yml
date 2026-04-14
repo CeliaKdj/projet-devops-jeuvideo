@@ -1,0 +1,52 @@
+name: CI Two-ships
+
+on:
+  push:
+    branches: ["main", "develop", "feat/two-ships"]
+    paths:
+      - 'games/Two-Ships-ITN/**'
+  pull_request:
+    branches: ["main", "develop", "feat/two-ships"]
+    paths:
+      - 'games/Two-Ships-ITN/**'
+
+jobs:
+  test-two-ships:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: games/Two-Ships-ITN/package-lock.json
+
+      - name: Install dependencies
+        working-directory: games/Two-Ships-ITN
+        run: npm install
+
+      - name: Security audit
+        working-directory: games/Two-Ships-ITN
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Run all tests
+        working-directory: games/Two-Ships-ITN
+        run: npm test
+
+      - name: Build project
+        working-directory: games/Two-Ships-ITN
+        run: npm run build
+
+      - name: Build Docker Image
+        working-directory: games/Two-Ships-ITN
+        run: docker build -t two-ships-itn:${{ github.sha }} .
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: game-dist
+          path: games/Two-Ships-ITN/dist/
