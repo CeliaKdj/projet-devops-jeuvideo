@@ -1,4 +1,4 @@
-name: CI two-ships
+name: CI Two-ships
 
 on:
   push:
