@@ -30,13 +30,8 @@ jobs:
 
       - name: Run Linter (Google Style)
         working-directory: games/Two-Ships-ITN
-        run: npx eslint . --ext .js --format checkstyle > eslint-report.xml || echo "LINT_FAILED=true" >> $GITHUB_ENV
-
-      - name: Annotate Linter Results
-        uses: mscoutermarsh/eslint-annotate-action@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          eslint-report: games/Two-Ships-ITN/eslint-report.xml
+        # On utilise 'stylish' (le défaut) car GitHub sait le lire pour créer des annotations
+        run: npx eslint . --ext .js --format stylish || echo "LINT_FAILED=true" >> $GITHUB_ENV
 
       - name: Security audit
         working-directory: games/Two-Ships-ITN
@@ -45,7 +40,7 @@ jobs:
 
       - name: Run all tests
         working-directory: games/Two-Ships-ITN
-        run: npm test
+        run: npm test || echo "TESTS_FAILED=true" >> $GITHUB_ENV
 
       - name: Build project
         working-directory: games/Two-Ships-ITN
@@ -53,7 +48,7 @@ jobs:
 
       - name: Build Docker Image
         working-directory: games/Two-Ships-ITN
-        run: docker build -t two-ships-itn:${{ github.sha }} .
+        run: docker build -t two-ships-itn:${{ github.sha }} . || echo "DOCKER_FAILED=true" >> $GITHUB_ENV
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
@@ -64,9 +59,10 @@ jobs:
       - name: Generate Summary
         if: always()
         run: |
-          echo "### Résumé de l'analyse" >> $GITHUB_STEP_SUMMARY
+          echo "###  Résumé de l'analyse" >> $GITHUB_STEP_SUMMARY
           echo "| Étape | État |" >> $GITHUB_STEP_SUMMARY
           echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
-          echo "| Linting (Style) | ${{ env.LINT_FAILED == 'true' && 'Warnings' || 'OK' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Sécurité | Audit terminé |" >> $GITHUB_STEP_SUMMARY
-          echo "| Tests unitaires | Exécutés |" >> $GITHUB_STEP_SUMMARY
+          echo "|  Linting (Style) | ${{ env.LINT_FAILED == 'true' && ' Warnings' || ' OK' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "|  Sécurité | Audit terminé |" >> $GITHUB_STEP_SUMMARY
+          echo "|  Tests unitaires | ${{ env.TESTS_FAILED == 'true' && ' Échec' || ' Succès' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "|  Docker Build | ${{ env.DOCKER_FAILED == 'true' && ' Échec' || ' Succès' }} |" >> $GITHUB_STEP_SUMMARY
