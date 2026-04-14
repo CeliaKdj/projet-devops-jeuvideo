@@ -2,7 +2,6 @@ import assert from 'assert';
 import { vec3_create, vec3_add, vec3_dot, vec3_distanceTo } from '../src/vec3.js';
 
 describe('Tests Logique : Vecteurs 3D (vec3.js)', function() {
-  
   it('doit créer un vecteur avec les coordonnées par défaut (0,0,0)', function() {
     const v = vec3_create();
     assert.strictEqual(v.x, 0);
@@ -26,5 +25,4 @@ describe('Tests Logique : Vecteurs 3D (vec3.js)', function() {
     const dist = vec3_distanceTo(p1, p2);
     assert.strictEqual(dist, 5);
   });
-
 });
