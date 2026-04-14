@@ -8,7 +8,7 @@ export var face3_create = (a, b, c) => ({
   vertexColors: [],
 });
 
-export var face3_clone = face => ({
+export var face3_clone = (face) => ({
   a: face.a,
   b: face.b,
   c: face.c,
