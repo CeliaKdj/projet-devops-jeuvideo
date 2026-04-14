@@ -2,11 +2,11 @@ name: CI Two-ships
 
 on:
   push:
-    branches: ["main", "develop"]
+    branches: ["main", "develop", "feat/two-ships"]
     paths:
       - 'games/Two-Ships-ITN/**'
   pull_request:
-    branches: ["main", "develop"]
+    branches: ["main", "develop", "feat/two-ships"]
     paths:
       - 'games/Two-Ships-ITN/**'
 
