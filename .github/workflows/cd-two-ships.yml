@@ -1,0 +1,35 @@
+name: CD Two-ships
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'games/Two-Ships-ITN/**'
+           
+jobs:
+  deploy-two-ships:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        working-directory: games/Two-Ships-ITN
+        run: npm install
+
+      - name: Build project
+        working-directory: games/Two-Ships-ITN
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: games/Two-Ships-ITN/dist
+          target-folder: two-ships
