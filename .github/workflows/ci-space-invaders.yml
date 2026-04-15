@@ -5,6 +5,7 @@ on:
     branches: ["main", "develop", "feat/space-invaders"]
   pull_request:
     branches: ["main", "develop", "feat/space-invaders"]
+  workflow_dispatch:
 
 jobs:
   test-space-invaders:
@@ -38,6 +39,12 @@ jobs:
       - name: Run unit tests
         working-directory: games/Space-Invaders
         run: npm test
+
+      # audit de sécurité des dépendances
+      - name: Security audit
+        working-directory: games/Space-Invaders
+        run: npm audit --audit-level=high
+        continue-on-error: true
 
       # compilation du projet
       - name: Build
