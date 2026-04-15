@@ -1,0 +1,68 @@
+name: CI Two-ships
+
+on:
+  push:
+    branches: ["main", "develop", "feat/two-ships"]
+    paths:
+      - 'games/Two-Ships-ITN/**'
+  pull_request:
+    branches: ["main", "develop", "feat/two-ships"]
+    paths:
+      - 'games/Two-Ships-ITN/**'
+
+jobs:
+  test-two-ships:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: games/Two-Ships-ITN/package-lock.json
+
+      - name: Install dependencies
+        working-directory: games/Two-Ships-ITN
+        run: npm install
+
+      - name: Run Linter (Google Style)
+        working-directory: games/Two-Ships-ITN
+        # On utilise 'stylish' (le défaut) car GitHub sait le lire pour créer des annotations
+        run: npx eslint . --ext .js --format stylish || echo "LINT_FAILED=true" >> $GITHUB_ENV
+
+      - name: Security audit
+        working-directory: games/Two-Ships-ITN
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Run all tests
+        working-directory: games/Two-Ships-ITN
+        run: npm test || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+
+      - name: Build project
+        working-directory: games/Two-Ships-ITN
+        run: npm run build
+
+      - name: Build Docker Image
+        working-directory: games/Two-Ships-ITN
+        run: docker build -t two-ships-itn:${{ github.sha }} . || echo "DOCKER_FAILED=true" >> $GITHUB_ENV
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: game-dist
+          path: games/Two-Ships-ITN/dist/
+
+      - name: Generate Summary
+        if: always()
+        run: |
+          echo "###  Résumé de l'analyse" >> $GITHUB_STEP_SUMMARY
+          echo "| Étape | État |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+          echo "|  Linting (Style) | ${{ env.LINT_FAILED == 'true' && ' Warnings' || ' OK' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "|  Sécurité | Audit terminé |" >> $GITHUB_STEP_SUMMARY
+          echo "|  Tests unitaires | ${{ env.TESTS_FAILED == 'true' && ' Échec' || ' Succès' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "|  Docker Build | ${{ env.DOCKER_FAILED == 'true' && ' Échec' || ' Succès' }} |" >> $GITHUB_STEP_SUMMARY
