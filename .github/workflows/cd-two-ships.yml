@@ -2,9 +2,13 @@ name: CD Two-ships
 
 on:
   push:
-    branches: ["main", "develop", "feat/two-ships"]
+    branches:
+      - main
+      - develop
+      - feat/two-ships
     paths:
       - 'games/Two-Ships-ITN/**'
+  workflow_dispatch:
 
 jobs:
   deploy-two-ships:
@@ -19,6 +23,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: games/Two-Ships-ITN/package-lock.json
 
       - name: Install dependencies
         working-directory: games/Two-Ships-ITN
