@@ -33,7 +33,17 @@ jobs:
         working-directory: games/Space-Invaders
         run: npm install
 
+      # vérification de la qualité du code
+      - name: Run lint
+        working-directory: games/Space-Invaders
+        run: npm run lint
+
       # lancement des tests
       - name: Run unit tests
         working-directory: games/Space-Invaders
         run: npm test
+
+      # compilation du projet
+      - name: Build
+        working-directory: games/Space-Invaders
+        run: npm run build
