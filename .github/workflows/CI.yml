@@ -3,14 +3,8 @@ name: Space Invaders
 on:
   push:
     branches: ["main", "develop", "feat/space-invaders"]
-    paths:
-      - 'games/Space-Invaders/**'
-      - '.github/workflows/CI.yml'
   pull_request:
     branches: ["main", "develop", "feat/space-invaders"]
-    paths:
-      - 'games/Space-Invaders/**'
-      - '.github/workflows/CI.yml'
 
 jobs:
   test-space-invaders:
