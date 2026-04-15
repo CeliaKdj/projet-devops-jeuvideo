@@ -1,0 +1,51 @@
+name: Space Invaders
+
+on:
+  push:
+    branches: ["main", "develop", "feat/space-invaders"]
+    paths:
+      - 'games/Space-Invaders/**'
+      - '.github/workflows/CI.yml'
+  pull_request:
+    branches: ["main", "develop", "feat/space-invaders"]
+    paths:
+      - 'games/Space-Invaders/**'
+      - '.github/workflows/CI.yml'
+
+jobs:
+  test-space-invaders:
+    name: Test Space Invaders
+    runs-on: ubuntu-latest
+    steps:
+      # recuperation du code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # installation Node.js 20
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          # chemin vers le lockfile pour optimiser la vitesse
+          cache-dependency-path: games/Space-Invaders/package-lock.json
+
+      # installation des dépendances
+      - name: Install dependencies
+        working-directory: games/Space-Invaders
+        run: npm install
+
+      # vérification de la qualité du code
+      - name: Run lint
+        working-directory: games/Space-Invaders
+        run: npm run lint
+
+      # lancement des tests
+      - name: Run unit tests
+        working-directory: games/Space-Invaders
+        run: npm test
+
+      # compilation du projet
+      - name: Build
+        working-directory: games/Space-Invaders
+        run: npm run build
