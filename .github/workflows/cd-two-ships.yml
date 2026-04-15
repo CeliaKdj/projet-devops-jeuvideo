@@ -2,10 +2,10 @@ name: CD Two-ships
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "develop", "feat/two-ships"]
     paths:
       - 'games/Two-Ships-ITN/**'
-           
+
 jobs:
   deploy-two-ships:
     runs-on: ubuntu-latest
