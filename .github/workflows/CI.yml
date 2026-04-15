@@ -2,11 +2,11 @@ name: Space Invaders
 
 on:
   push:
-    branches: ["main", "develop"]
+    branches: ["main", "develop", "feat/space-invaders"]
     paths:
       - 'games/Space-Invaders/**'
   pull_request:
-    branches: ["main", "develop"]
+    branches: ["main", "develop", "feat/space-invaders"]
     paths:
       - 'games/Space-Invaders/**'
 
