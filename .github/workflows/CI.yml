@@ -17,7 +17,7 @@ jobs:
     name: Test Space Invaders
     runs-on: ubuntu-latest
     steps:
-      # recuperation du code
+      # recuperation du cod
       - name: Checkout repository
         uses: actions/checkout@v4
 
