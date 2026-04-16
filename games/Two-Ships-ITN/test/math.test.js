@@ -19,7 +19,7 @@ describe('Math', function() {
   });
   describe('lerp()', function() {
     it('should return 41 for lerp(1, 3, 20)', function() {
-      expect(lerp(1, 3, 20)).to.equal(99);
+      expect(lerp(1, 3, 20)).to.equal(41);
     });
     it('should return -15.3 for lerp(1.3,-7,2)', function() {
       expect(lerp(1.3, -7, 2)).to.equal(-15.3);
