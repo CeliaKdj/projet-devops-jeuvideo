@@ -1,4 +1,12 @@
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: always
+
   two-ships:
     build:
       context: ./games/Two-Ships-ITN

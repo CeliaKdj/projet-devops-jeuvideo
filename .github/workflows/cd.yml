@@ -1,0 +1,31 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Space Invaders", "CI Two-ships"]
+    branches: ["main"]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy with Docker Compose
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      # récupération du code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # construction des images Docker
+      - name: Build Docker images
+        run: docker compose build
+
+      # lancement des conteneurs
+      - name: Start containers
+        run: docker compose up -d
+
+      # vérification que les conteneurs tournent
+      - name: Check containers
+        run: docker compose ps
