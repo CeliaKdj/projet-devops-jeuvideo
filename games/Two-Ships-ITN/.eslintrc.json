@@ -16,11 +16,16 @@
     "indent": ["error", 2],
     "quotes": ["error", "single"],
     "semi": ["error", "always"],
-    "no-var": "error",
+    "camelcase": "off",
+    "new-cap": "off",
+    "max-len": "off",
+    "no-var": "off",
+    "no-unused-vars": "warn",
+    "no-undef": "warn",
     "prefer-const": "error",
     "require-jsdoc": "off",
     "valid-jsdoc": "off",
-    "max-len": ["warn", { "code": 100 }],
+    // "max-len": ["warn", { "code": 100 }],
     "object-curly-spacing": ["error", "always"]
   }
 }

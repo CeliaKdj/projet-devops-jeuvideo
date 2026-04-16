@@ -8,4 +8,4 @@ export const mapLinear = (x, a1, a2, b1, b2) =>
   b1 + ((x - a1) * (b2 - b1)) / (a2 - a1);
 export const randFloat = (low, high) => low + Math.random() * (high - low);
 // genere de l'aleatoire pr que les elements du jeux napparaissent pas tjrs au meme endroit:
-export const randFloatSpread = range => range * (0.5 - Math.random());
+export const randFloatSpread = (range) => range * (0.5 - Math.random());
