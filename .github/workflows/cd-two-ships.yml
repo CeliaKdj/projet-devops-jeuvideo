@@ -39,3 +39,13 @@ jobs:
         with:
           folder: games/Two-Ships-ITN/dist
           target-folder: two-ships
+
+      - name: Notify Discord on Deployment Failure
+        if: failure()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ job.status }}
+          content: "🚨 **Échec du Déploiement** ! La mise en ligne de la plateforme a échoué."
+          title: "Alerte CD - Plateforme Jeux"
+          color: 0xff0000

@@ -9,6 +9,8 @@ on:
     branches: ["main", "develop", "feat/two-ships"]
     paths:
       - 'games/Two-Ships-ITN/**'
+  # pour le lancement manuel:
+  workflow_dispatch:
 
 jobs:
   test-two-ships:
@@ -30,17 +32,16 @@ jobs:
 
       - name: Run Linter (Google Style)
         working-directory: games/Two-Ships-ITN
-        # On utilise 'stylish' (le défaut) car GitHub sait le lire pour créer des annotations
         run: npx eslint . --ext .js --format stylish || echo "LINT_FAILED=true" >> $GITHUB_ENV
 
       - name: Security audit
         working-directory: games/Two-Ships-ITN
-        run: npm audit --audit-level=high
-        continue-on-error: true
+        run: npm audit --audit-level=critical || echo "AUDIT_FAILED=true" >> $GITHUB_ENV
 
       - name: Run all tests
         working-directory: games/Two-Ships-ITN
-        run: npm test || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+        run: npx mocha --reporter mocha-github-actions-reporter; then
+            echo "TESTS_FAILED=true" >> $GITHUB_ENV
 
       - name: Build project
         working-directory: games/Two-Ships-ITN
@@ -59,10 +60,20 @@ jobs:
       - name: Generate Summary
         if: always()
         run: |
-          echo "###  Résumé de l'analyse" >> $GITHUB_STEP_SUMMARY
-          echo "| Étape | État |" >> $GITHUB_STEP_SUMMARY
+          echo "### Resume de l'analyse" >> $GITHUB_STEP_SUMMARY
+          echo "| Etape | Etat |" >> $GITHUB_STEP_SUMMARY
           echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
-          echo "|  Linting (Style) | ${{ env.LINT_FAILED == 'true' && ' Warnings' || ' OK' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "|  Sécurité | Audit terminé |" >> $GITHUB_STEP_SUMMARY
-          echo "|  Tests unitaires | ${{ env.TESTS_FAILED == 'true' && ' Échec' || ' Succès' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "|  Docker Build | ${{ env.DOCKER_FAILED == 'true' && ' Échec' || ' Succès' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Linting (Style Google) | ${{ env.LINT_FAILED == 'true' && 'Erreurs detectees' || 'Conforme' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Securite (Audit) | ${{ env.AUDIT_FAILED == 'true' && 'Failles critiques trouvees' || 'Securise' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests unitaires | ${{ env.TESTS_FAILED == 'true' && 'Echec' || 'Succes' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Build | ${{ env.DOCKER_FAILED == 'true' && 'Echec' || 'Succes' }} |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send Discord Notification on Failure
+        if: failure()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ job.status }}
+          content: "❌ **Échec de la CI** : Une erreur a été détectée sur le jeu Two-Ships."
+          title: "Rapport de Pipeline"
+          color: 0xff0000
