@@ -1,0 +1,38 @@
+name: Frontend Lighthouse
+
+on:
+  push:
+    branches: ["main", "develop", "feat/frontend"]
+    paths:
+      - 'frontend/**'
+  pull_request:
+    branches: ["main", "develop"]
+    paths:
+      - 'frontend/**'
+  workflow_dispatch:
+
+jobs:
+  lighthouse:
+    name: Audit Lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      # récupération du code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # lancement du conteneur frontend
+      - name: Start frontend container
+        run: docker compose up -d frontend
+
+      # attendre que le serveur soit prêt
+      - name: Wait for server
+        run: sleep 5
+
+      # lancement de l'audit Lighthouse
+      - name: Run Lighthouse
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: |
+            http://localhost:8080
+          uploadArtifacts: true
+          temporaryPublicStorage: true
