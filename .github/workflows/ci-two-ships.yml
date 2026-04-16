@@ -40,8 +40,11 @@ jobs:
 
       - name: Run all tests
         working-directory: games/Two-Ships-ITN
-        run: npx mocha --reporter mocha-github-actions-reporter; then
+        run: |
+          if ! npx mocha --reporter mocha-github-actions-reporter; then
             echo "TESTS_FAILED=true" >> $GITHUB_ENV
+            exit 1
+          fi
 
       - name: Build project
         working-directory: games/Two-Ships-ITN
