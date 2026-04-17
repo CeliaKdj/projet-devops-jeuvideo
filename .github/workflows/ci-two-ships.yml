@@ -5,6 +5,8 @@ on:
     branches: ["main", "develop", "feat/two-ships"]
     paths:
       - 'games/Two-Ships-ITN/**'
+      - 'frontend/**'
+      - '.github/workflows/**'
   pull_request:
     branches: ["main", "develop", "feat/two-ships"]
     paths:
