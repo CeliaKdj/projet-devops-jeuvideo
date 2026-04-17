@@ -9,28 +9,26 @@ on:
     branches: ["main", "develop", "feat/two-ships"]
     paths:
       - 'games/Two-Ships-ITN/**'
-  # pour le lancement manuel:
   workflow_dispatch:
 
 jobs:
-  test-two-ships:
+  # JOB 1 qualité et tests
+  quality-and-tests:
+    name: Code Quality and Tests
     runs-on: ubuntu-latest
+    outputs:
+      lint_failed: ${{ env.LINT_FAILED }}
+      audit_failed: ${{ env.AUDIT_FAILED }}
+      tests_failed: ${{ env.TESTS_FAILED }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: games/Two-Ships-ITN/package-lock.json
 
       - name: Install dependencies
         working-directory: games/Two-Ships-ITN
         run: npm install
 
-      - name: Run Linter (Google Style)
+      - name: Run Linter
         working-directory: games/Two-Ships-ITN
         run: npx eslint . --ext .js --format stylish || echo "LINT_FAILED=true" >> $GITHUB_ENV
 
@@ -46,13 +44,28 @@ jobs:
             exit 1
           fi
 
+  # JOB 2 build et image docker
+  build-and-docker:
+    name: Build and Dockerization
+    needs: quality-and-tests
+    runs-on: ubuntu-latest
+    outputs:
+      docker_failed: ${{ env.DOCKER_FAILED }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        working-directory: games/Two-Ships-ITN
+        run: npm install
+
       - name: Build project
         working-directory: games/Two-Ships-ITN
         run: npm run build
 
       - name: Build Docker Image
         working-directory: games/Two-Ships-ITN
-        run: docker build -t two-ships-itn:${{ github.sha }} . || echo "DOCKER_FAILED=true" >> $GITHUB_ENV
+        run: docker build -t two-ships-itn:${{ github.sha }} . || (echo "DOCKER_FAILED=true" >> $GITHUB_ENV && exit 1)
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
@@ -60,23 +73,27 @@ jobs:
           name: game-dist
           path: games/Two-Ships-ITN/dist/
 
+  # JOB 3  reporting et notifications 
+  reporting:
+    name: Reporting and Notifications
+    needs: [quality-and-tests, build-and-docker]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
       - name: Generate Summary
-        if: always()
         run: |
           echo "### Resume de l'analyse" >> $GITHUB_STEP_SUMMARY
           echo "| Etape | Etat |" >> $GITHUB_STEP_SUMMARY
           echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
-          echo "| Linting (Style Google) | ${{ env.LINT_FAILED == 'true' && 'Erreurs detectees' || 'Conforme' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Securite (Audit) | ${{ env.AUDIT_FAILED == 'true' && 'Failles critiques trouvees' || 'Securise' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Tests unitaires | ${{ env.TESTS_FAILED == 'true' && 'Echec' || 'Succes' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Docker Build | ${{ env.DOCKER_FAILED == 'true' && 'Echec' || 'Succes' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Qualité & Tests | ${{ needs.quality-and-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build & Docker | ${{ needs.build-and-docker.result }} |" >> $GITHUB_STEP_SUMMARY
 
       - name: Send Discord Notification on Failure
         if: failure()
         uses: sarisia/actions-status-discord@v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          status: ${{ job.status }}
-          content: "❌ **Échec de la CI** : Une erreur a été détectée sur le jeu Two-Ships."
+          status: failure
+          content: "**Échec de la CI** : Une erreur a été détectée sur le jeu Two-Ships."
           title: "Rapport de Pipeline"
           color: 0xff0000

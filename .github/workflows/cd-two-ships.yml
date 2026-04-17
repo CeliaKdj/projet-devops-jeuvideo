@@ -46,6 +46,6 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           status: ${{ job.status }}
-          content: "🚨 **Échec du Déploiement** ! La mise en ligne de la plateforme a échoué."
+          content: "**Échec du Déploiement** ! La mise en ligne de la plateforme a échoué."
           title: "Alerte CD - Plateforme Jeux"
           color: 0xff0000
