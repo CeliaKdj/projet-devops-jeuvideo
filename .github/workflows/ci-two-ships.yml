@@ -97,3 +97,18 @@ jobs:
           content: "**Échec de la CI** : Une erreur a été détectée sur le jeu Two-Ships."
           title: "Rapport de Pipeline"
           color: 0xff0000
+
+  deploy-gh-pages:
+    name: Update Showcase (GitHub Pages)
+    needs: [quality-and-tests, build-and-docker]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy Frontend to GH Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend
